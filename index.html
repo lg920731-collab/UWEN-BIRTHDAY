@@ -39,11 +39,14 @@
       inset: 0;
       background: radial-gradient(circle at 0% 0%, var(--bg1), #ffe3c8 35%, #ffe4f2 70%, var(--bg2));
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       cursor: pointer;
       transition: opacity 0.8s ease;
+      padding: 16px;
+      text-align: center;
     }
 
     #intro-photo img {
@@ -59,7 +62,7 @@
       transition: opacity 0.4s ease, transform 0.4s ease;
     }
 
-    /* 切換 UWEN1 → UWEN3 用的小動畫 */
+    /* UWEN1 → UWEN3 切換的小動畫 */
     .photo-fade-out {
       opacity: 0;
       transform: scale(0.98);
@@ -73,6 +76,19 @@
     #intro-photo.fade-out {
       opacity: 0;
       pointer-events: none;
+    }
+
+    /* 封面底下那行淡淡的小字 */
+    .intro-caption {
+      margin-top: 18px;
+      font-size: 13px;
+      color: rgba(59, 47, 42, 0.82);
+      background: rgba(255, 253, 247, 0.88);
+      padding: 6px 16px;
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(148, 86, 40, 0.18);
+      max-width: 420px;
+      line-height: 1.5;
     }
 
     /* 彩帶 */
@@ -104,7 +120,7 @@
       100% { transform: translate3d(0, 120vh, 0) rotateZ(220deg); }
     }
 
-    /* 卡片 */
+    /* 卡片本體 */
     .card-wrapper {
       position: relative;
       z-index: 1;
@@ -302,18 +318,22 @@
       .title { font-size: 24px; }
       .avatar-wrap { width: 120px; height: 120px; }
       #intro-photo img { max-width: 360px; }
+      .intro-caption { font-size: 12px; padding: 6px 12px; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- happy-birthday.mp3 放跟這個 HTML 同一層 -->
+  <!-- happy-birthday.mp3：跟這個 HTML 放同一個資料夾 -->
   <audio id="bgm" src="happy-birthday.mp3" preload="auto"></audio>
 
-  <!-- 進場封面：第一次點顯示 UWEN1 → 點一次換 UWEN3 → 再點一次進入卡片 -->
-  <div id="intro-photo" title="點一下看下一張，再點一下進入生日卡片">
+  <!-- 進場封面：第一次點 → 換 UWEN3，第二次點 → 進入卡片 -->
+  <div id="intro-photo" title="點點看，前面是兩張照片，後面有一張小小的生日卡片">
     <img src="UWEN1.png" alt="UWEN1" id="intro-img" />
+    <div class="intro-caption">
+      點點看，前面是兩張照片，後面有一張小小的生日卡片 🎁
+    </div>
   </div>
 
   <!-- 彩帶 -->
@@ -335,7 +355,7 @@
 
           <div class="avatar-wrap">
             <div class="avatar">
-              <!-- 卡片上的照片：UWEN2 -->
+              <!-- 卡片封面上的照片：UWEN2 -->
               <img src="UWEN2.png" alt="UWEN2">
             </div>
           </div>
@@ -403,7 +423,53 @@
     const bgm = document.getElementById('bgm');
 
     let introStep = 0; // 0 = UWEN1, 1 = UWEN3, 2 = 進入卡片
+    let fadeInterval = null;
 
+    function clearFade() {
+      if (fadeInterval !== null) {
+        clearInterval(fadeInterval);
+        fadeInterval = null;
+      }
+    }
+
+    function fadeInAudio(audio, duration = 2000) {
+      if (!audio) return;
+      clearFade();
+      audio.volume = 0;
+      const step = 50 / duration; // 每 50ms 增加多少
+      const playPromise = audio.play();
+      if (playPromise) {
+        playPromise.catch(() => {});
+      }
+      fadeInterval = setInterval(() => {
+        if (audio.volume + step >= 1) {
+          audio.volume = 1;
+          clearFade();
+        } else {
+          audio.volume += step;
+        }
+      }, 50);
+    }
+
+    function fadeOutAudio(audio, duration = 1500) {
+      if (!audio) return;
+      clearFade();
+      let v = audio.volume;
+      const step = 50 / duration;
+      fadeInterval = setInterval(() => {
+        v -= step;
+        if (v <= 0) {
+          audio.volume = 0;
+          audio.pause();
+          audio.currentTime = 0;
+          clearFade();
+        } else {
+          audio.volume = v;
+        }
+      }, 50);
+    }
+
+    // 進場封面：兩張照片 + 進入卡片
     intro.addEventListener('click', () => {
       if (introStep === 0) {
         // UWEN1 -> UWEN3
@@ -429,15 +495,10 @@
     function toggleCard() {
       const isOpen = card.classList.toggle('is-open');
 
-      // 卡片打開時播放生日快樂歌
-      if (isOpen && bgm) {
-        try {
-          bgm.currentTime = 0;
-          const playPromise = bgm.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {});
-          }
-        } catch (e) {}
+      if (isOpen) {
+        fadeInAudio(bgm);
+      } else {
+        fadeOutAudio(bgm);
       }
     }
 
@@ -464,4 +525,3 @@
   </script>
 </body>
 </html>
-
