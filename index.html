@@ -121,16 +121,16 @@
     }
 
     /* 卡片本體 */
-    .card-wrapper {
-      position: relative;
-      z-index: 1;
-      perspective: 1400px;
-      max-width: 420px;
+    .card {
       width: 100%;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 1s ease, transform 1s ease;
+      height: 650px;  /* 原本 520px → 650px */
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.9s cubic-bezier(.22,.61,.36,1);
     }
+
 
     .card-wrapper.show {
       opacity: 1;
@@ -313,15 +313,14 @@
       55% { transform: scale(0.96); }
     }
 
-    @media (max-width: 480px) {
-      .card { height: 480px; }
-      .title { font-size: 24px; }
-      .avatar-wrap { width: 120px; height: 120px; }
-      #intro-photo img { max-width: 360px; }
-      .intro-caption { font-size: 12px; padding: 6px 12px; }
+   @media (max-width: 480px) {
+    .card { height: 620px; }  /* 原本 480px → 620px */
+    .title { font-size: 24px; }
+    .avatar-wrap { width: 120px; height: 120px; }
+    #intro-photo img { max-width: 360px; }
+    .intro-caption { font-size: 12px; padding: 6px 12px; }
     }
-  </style>
-</head>
+
 
 <body>
 
