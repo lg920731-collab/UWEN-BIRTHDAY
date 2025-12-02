@@ -554,96 +554,109 @@
     </div>
   </div>
 
-  <script>
-    const cardWrapper = document.getElementById('cardWrapper');
-    const confetti = document.querySelector('.confetti');
-    const music = document.getElementById('happySong');
-    const sparklesLayer = document.querySelector('.sparkles');
-    const photoLayer = document.getElementById('photoLayer');
-    const photoLeft = document.getElementById('photoLeft');
-    const photoRight = document.getElementById('photoRight');
+<script>
+  const cardWrapper = document.getElementById('cardWrapper');
+  const confetti = document.querySelector('.confetti');
+  const music = document.getElementById('happySong');
+  const sparklesLayer = document.querySelector('.sparkles');
+  const photoLayer = document.getElementById('photoLayer');
+  const photoLeft = document.getElementById('photoLeft');
+  const photoRight = document.getElementById('photoRight');
 
-    let hasPlayedMusic = false;
-    let photosMoved = false;
+  let hasPlayedMusic = false;
+  let photosMoved = false;
 
-    // 點照片層：照片往左右移，卡片出現，彩帶出現
-    photoLayer.addEventListener('click', () => {
-      if (photosMoved) return;
-      photosMoved = true;
+  // 點照片層：照片往左右移，卡片出現，彩帶出現
+  photoLayer.addEventListener('click', () => {
+    if (photosMoved) return;
+    photosMoved = true;
 
-      photoLeft.classList.add('to-left');
-      photoRight.classList.add('to-right');
+    // 依照螢幕大小決定要移多遠
+    let offset;
+    if (window.innerWidth <= 480) {
+      offset = 140;
+    } else if (window.innerWidth <= 768) {
+      offset = 160;
+    } else {
+      offset = 250;
+    }
 
-      cardWrapper.classList.add('show');
+    // ⭐ 直接改 transform，從正中間移到左右兩邊
+    photoLeft.style.transform  = `translate(-50%, -50%) translateX(-${offset}px)`;
+    photoRight.style.transform = `translate(-50%, -50%) translateX(${offset}px)`;
 
-      setTimeout(() => {
-        confetti.classList.add('show');
-        // 之後把事件讓給中間卡片
-        photoLayer.style.pointerEvents = 'none';
-      }, 600);
-    });
+    // 卡片淡入
+    cardWrapper.classList.add('show');
 
-    // 卡片換頁：front / back
-    const card = document.getElementById('card');
-    const btn = document.querySelector('.open-btn');
-    const frontFace = document.querySelector('.card-face.front');
-    const backFace = document.querySelector('.card-face.back');
-    let currentPage = 1; // 1 = 第一頁, 2 = 第二頁
+    setTimeout(() => {
+      confetti.classList.add('show');
+      // 之後把事件讓給中間卡片
+      photoLayer.style.pointerEvents = 'none';
+    }, 600);
+  });
 
-    function showPage(page) {
-      currentPage = page;
-      if (page === 1) {
-        frontFace.classList.add('active');
-        backFace.classList.remove('active');
-      } else {
-        frontFace.classList.remove('active');
-        backFace.classList.add('active');
+  // 卡片換頁：front / back
+  const card = document.getElementById('card');
+  const btn = document.querySelector('.open-btn');
+  const frontFace = document.querySelector('.card-face.front');
+  const backFace = document.querySelector('.card-face.back');
+  let currentPage = 1; // 1 = 第一頁, 2 = 第二頁
 
-        // 第一次翻到第二頁時播放音樂
-        if (!hasPlayedMusic && music) {
-          hasPlayedMusic = true;
-          music.currentTime = 0;
-          music.play().catch(() => {});
-        }
+  function showPage(page) {
+    currentPage = page;
+    if (page === 1) {
+      frontFace.classList.add('active');
+      backFace.classList.remove('active');
+    } else {
+      frontFace.classList.remove('active');
+      backFace.classList.add('active');
+
+      // 第一次翻到第二頁時播放音樂
+      if (!hasPlayedMusic && music) {
+        hasPlayedMusic = true;
+        music.currentTime = 0;
+        music.play().catch(() => {});
       }
     }
+  }
 
-    // 卡片點擊：在第一/第二頁之間切換（點空白處）
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.open-btn')) return;
-      const next = currentPage === 1 ? 2 : 1;
-      showPage(next);
-    });
+  // 卡片點擊：在第一/第二頁之間切換（點空白處）
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.open-btn')) return;
+    const next = currentPage === 1 ? 2 : 1;
+    showPage(next);
+  });
 
-    // 按鈕：直接打開第二頁
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showPage(2);
-    });
+  // 按鈕：直接打開第二頁
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showPage(2);
+  });
 
-    // 生成彩帶
-    const COUNT = 40;
-    for (let i = 0; i < COUNT; i++) {
-      const s = document.createElement('span');
-      s.style.left = Math.random() * 100 + '%';
-      s.style.animationDelay = (Math.random() * 6) + 's';
-      s.style.animationDuration = (5 + Math.random() * 4) + 's';
-      s.style.opacity = 0.5 + Math.random() * 0.5;
-      confetti.appendChild(s);
-    }
+  // 生成彩帶
+  const COUNT = 40;
+  for (let i = 0; i < COUNT; i++) {
+    const s = document.createElement('span');
+    s.style.left = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 6) + 's';
+    s.style.animationDuration = (5 + Math.random() * 4) + 's';
+    s.style.opacity = 0.5 + Math.random() * 0.5;
+    confetti.appendChild(s);
+  }
 
-    // 生成飄落亮點
-    const SPARKLE_COUNT = 60;
-    for (let i = 0; i < SPARKLE_COUNT; i++) {
-      const d = document.createElement('span');
-      const size = 2 + Math.random() * 4;
-      d.style.left = Math.random() * 100 + '%';
-      d.style.width = size + 'px';
-      d.style.height = size + 'px';
-      d.style.animationDuration = (7 + Math.random() * 6) + 's';
-      d.style.animationDelay = (Math.random() * 10) + 's';
-      sparklesLayer.appendChild(d);
-    }
-  </script>
+  // 生成飄落亮點
+  const SPARKLE_COUNT = 60;
+  for (let i = 0; i < SPARKLE_COUNT; i++) {
+    const d = document.createElement('span');
+    const size = 2 + Math.random() * 4;
+    d.style.left = Math.random() * 100 + '%';
+    d.style.width = size + 'px';
+    d.style.height = size + 'px';
+    d.style.animationDuration = (7 + Math.random() * 6) + 's';
+    d.style.animationDelay = (Math.random() * 10) + 's';
+    sparklesLayer.appendChild(d);
+  }
+</script>
+
 </body>
 </html>
