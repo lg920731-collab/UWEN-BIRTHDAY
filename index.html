@@ -54,7 +54,7 @@
       pointer-events: none;
     }
 
-    /* 包照片用的內層，方便疊兩張圖做淡入淡出 */
+    /* 包照片用的內層（加比例，避免高度變 0） */
     .intro-photo-inner {
       position: relative;
       width: 100%;
@@ -62,6 +62,8 @@
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-soft);
       overflow: hidden;
+      aspect-ratio: 3 / 4; /* 直立卡片比例 */
+      background: #ddd;
     }
 
     .intro-img {
@@ -233,15 +235,16 @@
       text-align: center;
       font-size: 14px;
       color: var(--text-soft);
-      line-height: 1.7;
-      margin-bottom: 10px;
+      line-height: 1.8;
+      margin-bottom: 14px;
     }
 
     .list-title {
       font-size: 13px;
       font-weight: 600;
       color: var(--text-soft);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
+      margin-top: 4px;
       text-align: center;
     }
 
@@ -249,7 +252,8 @@
       list-style: none;
       font-size: 14px;
       color: var(--text-main);
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      padding-left: 4px;
     }
 
     .wish-list li {
@@ -338,7 +342,7 @@
   <!-- happy-birthday.mp3：跟這個 HTML 放同一個資料夾 -->
   <audio id="bgm" src="happy-birthday.mp3" preload="auto"></audio>
 
-  <!-- 進場封面：第一次點 → UWEN1 淡出、UWEN3 淡入；第二次點 → 進入卡片 -->
+  <!-- 進場封面：第一次點 → UWEN1 淡出、UWEN3 淡入；第二次點 → 進入卡片＋開始音樂 -->
   <div id="intro-photo" title="點點看，前面是兩張照片，後面有一張小小的生日卡片">
     <div class="intro-photo-inner">
       <img src="UWEN1.png" alt="UWEN1" id="intro-img-1" class="intro-img show" />
@@ -374,10 +378,10 @@
           </div>
 
           <p class="front-text">
-  做了一張小小的線上生日卡片給妳，<br>
-  今天就先把那些煩心的事放一邊，<br>
-  好好讓自己開心一下，過個輕鬆的生日。😄🎉
-</p>
+            做了一張小小的線上生日卡片給妳，<br>
+            今天就先把那些煩心的事放一邊，<br>
+            好好讓自己開心一下，過個輕鬆的生日。😄🎉
+          </p>
 
           <p class="list-title">From 阿銘的祝福</p>
           <ul class="wish-list">
@@ -455,9 +459,7 @@
       audio.volume = 0;
       const step = 50 / duration;
       const playPromise = audio.play();
-      if (playPromise) {
-        playPromise.catch(() => {});
-      }
+      if (playPromise) playPromise.catch(() => {});
       fadeInterval = setInterval(() => {
         if (audio.volume + step >= 1) {
           audio.volume = 1;
@@ -468,25 +470,9 @@
       }, 50);
     }
 
-    function fadeOutAudio(audio, duration = 1500) {
-      if (!audio) return;
-      clearFade();
-      let v = audio.volume;
-      const step = 50 / duration;
-      fadeInterval = setInterval(() => {
-        v -= step;
-        if (v <= 0) {
-          audio.volume = 0;
-          audio.pause();
-          audio.currentTime = 0;
-          clearFade();
-        } else {
-          audio.volume = v;
-        }
-      }, 50);
-    }
+    // 這裡不再在翻頁時停音樂，除非你之後想加離開頁面才停
 
-    // 進場封面：兩張照片 + 進入卡片
+    // 進場封面：兩張照片 + 進入卡片＋開始音樂
     intro.addEventListener('click', () => {
       if (introStep === 0) {
         // 第一次點：UWEN1 淡出、UWEN3 淡入
@@ -494,22 +480,18 @@
         introImg1.classList.remove('show');
         introImg2.classList.add('show');
       } else if (introStep === 1) {
-        // 第二次點：進入卡片
+        // 第二次點：進入卡片 + 開始音樂
         introStep = 2;
         intro.classList.add('fade-out');
         cardWrapper.classList.add('show');
         setTimeout(() => confetti.classList.add('show'), 600);
+        fadeInAudio(bgm);  // 這裡開始 BGM
       }
     });
 
     function toggleCard() {
-      const isOpen = card.classList.toggle('is-open');
-
-      if (isOpen) {
-        fadeInAudio(bgm);
-      } else {
-        fadeOutAudio(bgm);
-      }
+      // 只負責翻頁，不控制音樂
+      card.classList.toggle('is-open');
     }
 
     card.addEventListener('click', (e) => {
