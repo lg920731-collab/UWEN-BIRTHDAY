@@ -1,3 +1,10 @@
+我幫你直接改好：
+✅ 文字行距/段距變比較緊
+✅ 願望清單間距也縮小
+✅ 內頁內容改成「認識兩年、一起酸甜苦辣＋還有我」版本
+
+下面整份可以直接貼回去用，覆蓋你原本的那一個：
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -139,7 +146,7 @@
 
     .card {
       width: 100%;
-      height: 650px;  /* 加高 */
+      height: 650px;
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-soft);
       cursor: pointer;
@@ -274,10 +281,10 @@
     }
 
     .message {
-      font-size: 15px;      /* 稍微放大 */
-      line-height: 1.8;
+      font-size: 15px;
+      line-height: 1.65;    /* 行距縮小 */
       white-space: pre-line;
-      margin-bottom: 18px;
+      margin-bottom: 12px;  /* 段距縮小 */
       color: var(--text-main);
     }
 
@@ -285,16 +292,18 @@
       font-size: 13px;
       font-weight: 600;
       color: var(--text-soft);
-      margin-bottom: 4px;
+      margin-bottom: 2px;   /* 更緊實 */
     }
 
     .wish-list {
       list-style: none;
-      font-size: 14px;      /* 放大 */
+      font-size: 14px;
       color: var(--text-main);
     }
 
-    .wish-list li { padding: 4px 0; }
+    .wish-list li {
+      padding: 2px 0;       /* 間距縮小 */
+    }
 
     .footer {
       margin-top: auto;
@@ -318,7 +327,7 @@
     }
 
     @media (max-width: 480px) {
-      .card { height: 620px; }  /* 手機也高一點 */
+      .card { height: 620px; }
       .title { font-size: 24px; }
       .avatar-wrap { width: 120px; height: 120px; }
       #intro-photo img { max-width: 360px; }
@@ -387,17 +396,17 @@
           <p class="message">
 阿雯，生日快樂！🥳
 
-我們認識這段時間，謝謝妳一直願意跟我分享生活，
+我們認識也兩年了，這段時間一起經歷過酸甜苦辣，
 不管是好笑的、崩潰的，還是很日常的那種，
-有妳可以聊一聊，很多事情都變得比較沒那麼難熬。
+有妳可以聊一聊，很多事情都變得沒有那麼難。
 
 新的一年，希望妳：
-遇到的麻煩事可以少一點，
-遇到的好人好事可以多一點。
+遇到的麻煩事可以再少一點，
+遇到的好人好事可以再多一點。
 
 也希望妳不要忘記，
-在「很忙、很累、很煩」之外，
-妳本身就是一個很值得被好好對待的人。🧡
+在那些「很忙、很累、很煩」的時候，
+其實妳不是一個人，還有我在。🧡
           </p>
 
           <p class="list-title">幫妳列三個生日願望（好友版）：</p>
