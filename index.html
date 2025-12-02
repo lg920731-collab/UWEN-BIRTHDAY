@@ -33,7 +33,7 @@
       color: var(--text-main);
     }
 
-    /* 進場封面照片（跟卡片一樣大小） */
+    /* 進場封面：容器 */
     #intro-photo {
       position: fixed;
       inset: 0;
@@ -49,33 +49,34 @@
       text-align: center;
     }
 
-    #intro-photo img {
+    #intro-photo.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* 包照片用的內層，方便疊兩張圖做淡入淡出 */
+    .intro-photo-inner {
+      position: relative;
       width: 100%;
       max-width: 420px;
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-soft);
-      height: auto;
-      display: block;
+      overflow: hidden;
+    }
+
+    .intro-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      opacity: 1;
-      transform: scale(1);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-
-    /* UWEN1 → UWEN3 切換的小動畫 */
-    .photo-fade-out {
       opacity: 0;
-      transform: scale(0.98);
+      transition: opacity 0.8s ease;
+      display: block;
     }
 
-    .photo-fade-in {
+    .intro-img.show {
       opacity: 1;
-      transform: scale(1);
-    }
-
-    #intro-photo.fade-out {
-      opacity: 0;
-      pointer-events: none;
     }
 
     /* 封面底下那行淡淡的小字 */
@@ -232,8 +233,28 @@
       text-align: center;
       font-size: 14px;
       color: var(--text-soft);
-      line-height: 1.6;
-      margin-bottom: 18px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .list-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 2px;
+      text-align: center;
+    }
+
+    .wish-list {
+      list-style: none;
+      font-size: 14px;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .wish-list li {
+      padding: 2px 0;
+      text-align: left;
     }
 
     .open-hint { margin-top: auto; display: flex; justify-content: center; }
@@ -275,27 +296,10 @@
 
     .message {
       font-size: 15px;
-      line-height: 1.65;    /* 行距縮小 */
+      line-height: 1.65;
       white-space: pre-line;
-      margin-bottom: 12px;  /* 段距縮小 */
+      margin-bottom: 12px;
       color: var(--text-main);
-    }
-
-    .list-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-soft);
-      margin-bottom: 2px;   /* 更緊實 */
-    }
-
-    .wish-list {
-      list-style: none;
-      font-size: 14px;
-      color: var(--text-main);
-    }
-
-    .wish-list li {
-      padding: 2px 0;       /* 間距縮小 */
     }
 
     .footer {
@@ -323,7 +327,7 @@
       .card { height: 620px; }
       .title { font-size: 24px; }
       .avatar-wrap { width: 120px; height: 120px; }
-      #intro-photo img { max-width: 360px; }
+      .intro-photo-inner { max-width: 360px; }
       .intro-caption { font-size: 12px; padding: 6px 12px; }
     }
   </style>
@@ -334,9 +338,12 @@
   <!-- happy-birthday.mp3：跟這個 HTML 放同一個資料夾 -->
   <audio id="bgm" src="happy-birthday.mp3" preload="auto"></audio>
 
-  <!-- 進場封面：第一次點 → 換 UWEN3，第二次點 → 進入卡片 -->
+  <!-- 進場封面：第一次點 → UWEN1 淡出、UWEN3 淡入；第二次點 → 進入卡片 -->
   <div id="intro-photo" title="點點看，前面是兩張照片，後面有一張小小的生日卡片">
-    <img src="UWEN1.png" alt="UWEN1" id="intro-img" />
+    <div class="intro-photo-inner">
+      <img src="UWEN1.png" alt="UWEN1" id="intro-img-1" class="intro-img show" />
+      <img src="UWEN3.png" alt="UWEN3" id="intro-img-2" class="intro-img" />
+    </div>
     <div class="intro-caption">
       點點看!!!!!!!!!!!!! 🎁
     </div>
@@ -367,10 +374,17 @@
           </div>
 
           <p class="front-text">
-            做了一張小小的線上生日卡片給妳，<br>
-            今天就先把那些麻煩事放一邊，<br>
-            開心一下，讓自己好好過個愉快的生日。😄🎉
-          </p>
+  做了一張小小的線上生日卡片給妳，<br>
+  今天就先把那些煩心的事放一邊，<br>
+  好好讓自己開心一下，過個輕鬆的生日。😄🎉
+</p>
+
+          <p class="list-title">From 阿銘的祝福</p>
+          <ul class="wish-list">
+            <li>🌚 祝妳每天都睡得好好的、吃得開心。</li>
+            <li>🎁 祝妳想要的事情順一點、不想要的事情遠一點。</li>
+            <li>🥳 祝陪著妳走過之後每一年的人，都是值得信任的人。</li>
+          </ul>
 
           <div class="open-hint">
             <button class="open-btn" type="button">
@@ -405,13 +419,6 @@
 其實妳不是一個人，還有我阿銘在😆。🧡
           </p>
 
-          <p class="list-title">幫妳列三個生日願望（好友版）：</p>
-          <ul class="wish-list">
-            <li>🌚 祝妳每天都睡得好好的、吃得開心。</li>
-            <li>🎁 祝妳想要的事情順一點、不想要的事情遠一點。</li>
-            <li>🥳 祝陪著妳走過之後每一年的人，都是值得信任的人。</li>
-          </ul>
-
           <div class="footer">
             <span>From：永遠的好朋友-阿～銘～</span>
             <span class="heart">⭐</span>
@@ -424,14 +431,15 @@
 
   <script>
     const intro = document.getElementById('intro-photo');
-    const introImg = document.getElementById('intro-img');
+    const introImg1 = document.getElementById('intro-img-1');
+    const introImg2 = document.getElementById('intro-img-2');
     const cardWrapper = document.getElementById('cardWrapper');
     const confetti = document.querySelector('.confetti');
     const card = document.getElementById('card');
     const btn = document.querySelector('.open-btn');
     const bgm = document.getElementById('bgm');
 
-    let introStep = 0; // 0 = UWEN1, 1 = UWEN3, 2 = 進入卡片
+    let introStep = 0; // 0 = 顯示 UWEN1, 1 = 顯示 UWEN3, 2 = 進入卡片
     let fadeInterval = null;
 
     function clearFade() {
@@ -445,7 +453,7 @@
       if (!audio) return;
       clearFade();
       audio.volume = 0;
-      const step = 50 / duration; // 每 50ms 增加多少
+      const step = 50 / duration;
       const playPromise = audio.play();
       if (playPromise) {
         playPromise.catch(() => {});
@@ -481,19 +489,12 @@
     // 進場封面：兩張照片 + 進入卡片
     intro.addEventListener('click', () => {
       if (introStep === 0) {
-        // UWEN1 -> UWEN3
+        // 第一次點：UWEN1 淡出、UWEN3 淡入
         introStep = 1;
-        introImg.classList.add('photo-fade-out');
-        setTimeout(() => {
-          introImg.src = 'UWEN3.png';
-          introImg.classList.remove('photo-fade-out');
-          introImg.classList.add('photo-fade-in');
-          setTimeout(() => {
-            introImg.classList.remove('photo-fade-in');
-          }, 400);
-        }, 300);
+        introImg1.classList.remove('show');
+        introImg2.classList.add('show');
       } else if (introStep === 1) {
-        // 第二次點，進入卡片
+        // 第二次點：進入卡片
         introStep = 2;
         intro.classList.add('fade-out');
         cardWrapper.classList.add('show');
