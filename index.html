@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -93,7 +93,7 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 2; /* 介於花草(0) 和 卡片(5) / 彩帶(1) 之間 */
+      z-index: 2;
       overflow: hidden;
     }
 
@@ -115,12 +115,8 @@
         transform: translate3d(0, -10vh, 0) scale(0.9);
         opacity: 0;
       }
-      10% {
-        opacity: 1;
-      }
-      80% {
-        opacity: 1;
-      }
+      10% { opacity: 1; }
+      80% { opacity: 1; }
       100% {
         transform: translate3d(0, 110vh, 0) scale(1.1);
         opacity: 0;
@@ -158,24 +154,67 @@
       100% { transform: translate3d(0, 120vh, 0) rotateZ(220deg); }
     }
 
-    /* 卡片主體 */
-    .card-wrapper {
-      position: relative;
-      z-index: 5;
-      width: 420px;     /* ★強制寬度一致 */
-      height: 520px;    /* ★強制高度一致 */
+    /* 照片層：一開始在中間，點一下後分別移到左右兩側 */
+    .photo-layer {
+      position: fixed;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto;    /* ★置中 */
+      pointer-events: auto;
+      z-index: 4;
+    }
+
+    .photo-frame {
+      position: absolute;
+      width: 320px;
+      height: 440px;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      background: #000;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition:
+        transform 0.9s cubic-bezier(.22,.61,.36,1),
+        box-shadow 0.9s ease;
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 點完之後：照片移到卡片左右兩側 */
+    body.photos-side #photoLeft {
+      transform: translate(calc(-50% - 250px), -50%);
+    }
+
+    body.photos-side #photoRight {
+      transform: translate(calc(-50% + 250px), -50%);
+    }
+
+    body.photos-side .photo-layer {
+      pointer-events: none; /* 之後讓滑鼠能點到中間卡片 */
+    }
+
+    /* 卡片主體（中間那張） */
+    .card-wrapper {
+      position: relative;
+      z-index: 5;
+      max-width: 420px;
+      width: 100%;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(20px) scale(0.96);
       transition: opacity 1s ease, transform 1s ease;
     }
 
     .card-wrapper.show {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
 
     .card {
@@ -196,13 +235,10 @@
       border-radius: inherit;
     }
 
-    /* 每一頁：同一位置切換（淡入＋微滑動） */
+    /* 每一頁：同一位置切換（淡入） */
     .card-face {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       border-radius: inherit;
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 240, 0.96));
       border: 1px solid var(--card-border);
@@ -214,51 +250,9 @@
       transition: opacity 0.6s ease;
     }
 
-/* 有 active 才顯示在頂層 */
-.card-face.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-
     .card-face.active {
       opacity: 1;
-      transform: translateX(0);
       pointer-events: auto;
-    }
-
-    /* 開場照片（與卡片同尺寸、同位置） */
-    .intro-photo {
-      position: absolute;    /* ★疊在最上層 */
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 420px;
-      height: 520px;
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      box-shadow: var(--shadow-soft);
-      cursor: pointer;
-      z-index: 10;
-      transition: opacity 0.6s ease, transform 0.6s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-    }
-
-
-    .intro-photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .intro-photo.fade-out {
-      opacity: 0;
-      transform: scale(0.96);
-      pointer-events: none;
     }
 
     /* 封面內容 */
@@ -318,17 +312,18 @@
       justify-content: center;
       background: #ffe9c2;
       text-align: center;
-      padding: 10px;
+      padding: 0;
       color: #7c6658;
       font-size: 13px;
     }
+
+    /* 放阿雯頭像照片：UWEN1.png */
     .avatar img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* 讓照片鋪滿又不變形 */
+      object-fit: cover;
       display: block;
     }
-
 
     .front-text {
       text-align: center;
@@ -430,11 +425,28 @@
       55% { transform: scale(0.96); }
     }
 
-    @media (max-width: 480px) {
-      .card { height: 480px; }
-      .intro-photo {
-        height: 480px;
+    @media (max-width: 768px) {
+      body.photos-side #photoLeft {
+        transform: translate(calc(-50% - 160px), -50%) scale(0.9);
       }
+      body.photos-side #photoRight {
+        transform: translate(calc(-50% + 160px), -50%) scale(0.9);
+      }
+      .card { height: 500px; }
+    }
+
+    @media (max-width: 480px) {
+      .photo-frame {
+        width: 240px;
+        height: 330px;
+      }
+      body.photos-side #photoLeft {
+        transform: translate(calc(-50% - 140px), -50%) scale(0.9);
+      }
+      body.photos-side #photoRight {
+        transform: translate(calc(-50% + 140px), -50%) scale(0.9);
+      }
+      .card { height: 480px; }
       .title { font-size: 24px; }
       .avatar-wrap { width: 120px; height: 120px; }
     }
@@ -459,13 +471,22 @@
   <!-- 彩帶 -->
   <div class="confetti"></div>
 
-  <!-- 開場卡片大小的照片（點一下進入卡片） -->
-  <div id="intro-photo" class="intro-photo" title="點一下進入生日卡片">
-    <!-- 換成你自己的照片網址 -->
-    <img src="UWEN.png" alt="阿雯照片" />
+  <!-- 照片層：一開始只看到中間照片，點一下之後移到左右兩側 -->
+  <div class="photo-layer" id="photoLayer" title="點一下進入生日卡片">
+    <!-- 左側那張：可以放 UWEN1.png 或另一張 -->
+    <div class="photo-frame" id="photoLeft">
+      <!-- TODO：改成你的照片檔案路徑 -->
+      <img src="PHOTO_LEFT.jpg" alt="照片 1">
+    </div>
+
+    <!-- 右側那張：再加一頁照片 -->
+    <div class="photo-frame" id="photoRight">
+      <!-- TODO：改成你的第二張照片，例如 UWEN1.png -->
+      <img src="PHOTO_RIGHT.jpg" alt="照片 2">
+    </div>
   </div>
 
-  <!-- 生日卡片 -->
+  <!-- 生日卡片（在中間） -->
   <div class="card-wrapper" id="cardWrapper">
     <div class="card" id="card">
       <div class="card-inner">
@@ -482,6 +503,7 @@
 
           <div class="avatar-wrap">
             <div class="avatar">
+              <!-- 這裡放 UWEN1.png 頭像 -->
               <img src="UWEN1.png" alt="阿雯" />
             </div>
           </div>
@@ -540,22 +562,22 @@
   </div>
 
   <script>
-    // 進場照片 → 點一下後淡出、卡片淡入 & 彩帶出現
-    const intro = document.getElementById('intro-photo');
     const cardWrapper = document.getElementById('cardWrapper');
     const confetti = document.querySelector('.confetti');
     const music = document.getElementById('happySong');
     const sparklesLayer = document.querySelector('.sparkles');
+    const photoLayer = document.getElementById('photoLayer');
+
     let hasPlayedMusic = false;
 
-    intro.addEventListener('click', () => {
-      intro.classList.add('fade-out');
+    // 點照片層：照片往左右移，卡片出現，彩帶出現
+    photoLayer.addEventListener('click', () => {
+      document.body.classList.add('photos-side');
       cardWrapper.classList.add('show');
-
       setTimeout(() => confetti.classList.add('show'), 600);
     });
 
-    // 換頁：同一位置切換 front / back
+    // 卡片換頁：front / back
     const card = document.getElementById('card');
     const btn = document.querySelector('.open-btn');
     const frontFace = document.querySelector('.card-face.front');
@@ -575,16 +597,14 @@
         if (!hasPlayedMusic && music) {
           hasPlayedMusic = true;
           music.currentTime = 0;
-          music.play().catch(() => {
-            // 有些瀏覽器可能會擋，失敗就安靜略過
-          });
+          music.play().catch(() => {});
         }
       }
     }
 
     // 卡片點擊：在第一/第二頁之間切換（點空白處）
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.open-btn')) return; // 按鈕另外處理
+      if (e.target.closest('.open-btn')) return;
       const next = currentPage === 1 ? 2 : 1;
       showPage(next);
     });
@@ -610,11 +630,11 @@
     const SPARKLE_COUNT = 60;
     for (let i = 0; i < SPARKLE_COUNT; i++) {
       const d = document.createElement('span');
-      const size = 2 + Math.random() * 4; // 2~6px
+      const size = 2 + Math.random() * 4;
       d.style.left = Math.random() * 100 + '%';
       d.style.width = size + 'px';
       d.style.height = size + 'px';
-      d.style.animationDuration = (7 + Math.random() * 6) + 's'; // 7~13s
+      d.style.animationDuration = (7 + Math.random() * 6) + 's';
       d.style.animationDelay = (Math.random() * 10) + 's';
       sparklesLayer.appendChild(d);
     }
