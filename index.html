@@ -7,7 +7,7 @@
 
   <style>
     :root {
-      /* 換成比較中性一點的配色（偏橘黃、溫暖，不那麼粉紅戀愛） */
+      /* 溫暖、不曖昧的朋友風格配色 */
       --bg1: #ffe9c7;
       --bg2: #ffe0f0;
       --card-bg: #fffdf7;
@@ -32,31 +32,60 @@
       justify-content: center;
       padding: 24px;
       color: var(--text-main);
+      position: relative;
     }
 
-    /* 進場封面照片（全畫面） */
-    #intro-photo {
+    /* 背景花草裝飾（在卡片後面淡淡的） */
+    .garden {
       position: fixed;
       inset: 0;
-      background: #000;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.7;
+    }
+
+    .flower-blob {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 999px;
+      filter: blur(1px);
+      opacity: 0.75;
+    }
+
+    .flower-blob::before {
+      content: "✿";
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
-      cursor: pointer;
-      transition: opacity 0.8s ease;
+      font-size: 40px;
+      color: rgba(124, 92, 59, 0.75);
     }
 
-    #intro-photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+    .flower-1 {
+      top: 8%;
+      left: 6%;
+      background: radial-gradient(circle at 30% 30%, #fff7dc, #ffd4b8);
     }
 
-    #intro-photo.fade-out {
-      opacity: 0;
-      pointer-events: none;
+    .flower-2 {
+      bottom: 10%;
+      right: 8%;
+      background: radial-gradient(circle at 60% 20%, #ffeaf5, #ffc7df);
+    }
+
+    .flower-3 {
+      bottom: 4%;
+      left: 12%;
+      background: radial-gradient(circle at 40% 40%, #e8f9dd, #c8e6b5);
+    }
+
+    .flower-4 {
+      top: 18%;
+      right: 14%;
+      background: radial-gradient(circle at 40% 40%, #fff5e1, #ffd1a0);
     }
 
     /* 彩帶背景 */
@@ -65,7 +94,7 @@
       inset: 0;
       pointer-events: none;
       overflow: hidden;
-      z-index: 0;
+      z-index: 1;
       opacity: 0;
       transition: opacity 1.2s ease;
     }
@@ -93,7 +122,7 @@
     /* 卡片主體 */
     .card-wrapper {
       position: relative;
-      z-index: 1;
+      z-index: 5;
       perspective: 1400px;
       max-width: 420px;
       width: 100%;
@@ -143,6 +172,38 @@
 
     .card-face.back {
       transform: rotateY(180deg);
+    }
+
+    /* 開場照片（與卡片同尺寸） */
+    .intro-photo {
+      width: 420px;
+      max-width: 90vw;
+      height: 520px;
+      max-height: 90vh;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      cursor: pointer;
+      z-index: 10;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    .intro-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .intro-photo.fade-out {
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
     }
 
     /* 封面內容 */
@@ -309,6 +370,9 @@
 
     @media (max-width: 480px) {
       .card { height: 480px; }
+      .intro-photo {
+        height: 480px;
+      }
       .title { font-size: 24px; }
       .avatar-wrap { width: 120px; height: 120px; }
     }
@@ -316,15 +380,27 @@
 </head>
 
 <body>
+  <!-- 生日快樂歌：自己準備 happy-birthday.mp3 或改成線上網址 -->
+  <audio id="happySong" src="happy-birthday.mp3" preload="auto"></audio>
 
-  <!-- 進入時先看到的照片：點一下進入卡片 -->
-  <div id="intro-photo" title="點一下進入生日卡片">
-    <img src="https://YOUR_IMAGE_URL" alt="UWEN.png" />
+  <!-- 背景花草 -->
+  <div class="garden" aria-hidden="true">
+    <div class="flower-blob flower-1"></div>
+    <div class="flower-blob flower-2"></div>
+    <div class="flower-blob flower-3"></div>
+    <div class="flower-blob flower-4"></div>
   </div>
 
   <!-- 彩帶 -->
   <div class="confetti"></div>
 
+  <!-- 開場卡片大小的照片（點一下進入卡片） -->
+  <div id="intro-photo" class="intro-photo" title="點一下進入生日卡片">
+    <!-- 換成你自己的照片網址 -->
+    <img src="https://YOUR_IMAGE_URL" alt="UWEN.png" />
+  </div>
+
+  <!-- 生日卡片 -->
   <div class="card-wrapper" id="cardWrapper">
     <div class="card" id="card">
       <div class="card-inner">
@@ -400,9 +476,11 @@
 
   <script>
     // 進場照片 → 點一下後淡出、卡片淡入 & 彩帶出現
-    const intro = document.getElementById('intro-photo');
+    const intro = document.querySelector('.intro-photo');
     const cardWrapper = document.getElementById('cardWrapper');
     const confetti = document.querySelector('.confetti');
+    const music = document.getElementById('happySong');
+    let hasPlayedMusic = false;
 
     intro.addEventListener('click', () => {
       intro.classList.add('fade-out');
@@ -411,12 +489,22 @@
       setTimeout(() => confetti.classList.add('show'), 600);
     });
 
-    // 卡片翻轉
+    // 卡片翻轉 + 第一次打開時播放生日快樂歌
     const card = document.getElementById('card');
     const btn = document.querySelector('.open-btn');
 
     function toggleCard() {
+      const willOpen = !card.classList.contains('is-open');
       card.classList.toggle('is-open');
+
+      // 第一次打開內頁時播放音樂
+      if (willOpen && !hasPlayedMusic && music) {
+        hasPlayedMusic = true;
+        music.currentTime = 0;
+        music.play().catch(() => {
+          // 有些瀏覽器可能會擋，失敗就安靜略過
+        });
+      }
     }
 
     card.addEventListener('click', (e) => {
