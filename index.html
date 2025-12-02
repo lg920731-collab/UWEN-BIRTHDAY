@@ -188,17 +188,13 @@
       display: block;
     }
 
-    /* 點完之後：照片移到卡片左右兩側 */
-    body.photos-side #photoLeft {
+    /* 點完之後：照片移到卡片左右兩側（用 class 控制） */
+    .photo-frame.to-left {
       transform: translate(calc(-50% - 250px), -50%);
     }
 
-    body.photos-side #photoRight {
+    .photo-frame.to-right {
       transform: translate(calc(-50% + 250px), -50%);
-    }
-
-    body.photos-side .photo-layer {
-      pointer-events: none; /* 之後讓滑鼠能點到中間卡片 */
     }
 
     /* 卡片主體（中間那張） */
@@ -210,15 +206,14 @@
       opacity: 0;
       transform: translateY(20px) scale(0.96);
       transition: opacity 1s ease, transform 1s ease;
-      pointer-events: none; 
+      pointer-events: none;
     }
 
     .card-wrapper.show {
       opacity: 1;
       transform: translateY(0) scale(1);
-      pointer-events: auto;          /* ★ 新增：顯示後才可以點卡片 */
+      pointer-events: auto;
     }
-
 
     .card {
       width: 100%;
@@ -320,7 +315,7 @@
       font-size: 13px;
     }
 
-    /* 放阿雯頭像照片：UWEN1.png */
+    /* 放阿雯頭像照片：UWEN.png */
     .avatar img {
       width: 100%;
       height: 100%;
@@ -429,10 +424,10 @@
     }
 
     @media (max-width: 768px) {
-      body.photos-side #photoLeft {
+      .photo-frame.to-left {
         transform: translate(calc(-50% - 160px), -50%) scale(0.9);
       }
-      body.photos-side #photoRight {
+      .photo-frame.to-right {
         transform: translate(calc(-50% + 160px), -50%) scale(0.9);
       }
       .card { height: 500px; }
@@ -443,10 +438,10 @@
         width: 240px;
         height: 330px;
       }
-      body.photos-side #photoLeft {
+      .photo-frame.to-left {
         transform: translate(calc(-50% - 140px), -50%) scale(0.9);
       }
-      body.photos-side #photoRight {
+      .photo-frame.to-right {
         transform: translate(calc(-50% + 140px), -50%) scale(0.9);
       }
       .card { height: 480px; }
@@ -476,15 +471,11 @@
 
   <!-- 照片層：一開始只看到中間照片，點一下之後移到左右兩側 -->
   <div class="photo-layer" id="photoLayer" title="點一下進入生日卡片">
-    <!-- 左側那張：可以放 UWEN1.png 或另一張 -->
     <div class="photo-frame" id="photoLeft">
-      <!-- TODO：改成你的照片檔案路徑 -->
       <img src="UWEN1.png" alt="照片 1">
     </div>
 
-    <!-- 右側那張：再加一頁照片 -->
     <div class="photo-frame" id="photoRight">
-      <!-- TODO：改成你的第二張照片，例如 UWEN2.png -->
       <img src="UWEN2.png" alt="照片 2">
     </div>
   </div>
@@ -506,7 +497,6 @@
 
           <div class="avatar-wrap">
             <div class="avatar">
-              <!-- 這裡放 UWEN.png 頭像 -->
               <img src="UWEN.png" alt="阿雯" />
             </div>
           </div>
@@ -570,14 +560,27 @@
     const music = document.getElementById('happySong');
     const sparklesLayer = document.querySelector('.sparkles');
     const photoLayer = document.getElementById('photoLayer');
+    const photoLeft = document.getElementById('photoLeft');
+    const photoRight = document.getElementById('photoRight');
 
     let hasPlayedMusic = false;
+    let photosMoved = false;
 
     // 點照片層：照片往左右移，卡片出現，彩帶出現
     photoLayer.addEventListener('click', () => {
-      document.body.classList.add('photos-side');
+      if (photosMoved) return;
+      photosMoved = true;
+
+      photoLeft.classList.add('to-left');
+      photoRight.classList.add('to-right');
+
       cardWrapper.classList.add('show');
-      setTimeout(() => confetti.classList.add('show'), 600);
+
+      setTimeout(() => {
+        confetti.classList.add('show');
+        // 之後把事件讓給中間卡片
+        photoLayer.style.pointerEvents = 'none';
+      }, 600);
     });
 
     // 卡片換頁：front / back
