@@ -33,11 +33,11 @@
       color: var(--text-main);
     }
 
-    /* 進場封面照片（卡片大小） */
+    /* 進場封面照片（跟卡片一樣大小） */
     #intro-photo {
       position: fixed;
       inset: 0;
-       background: radial-gradient(circle at 0% 0%, var(--bg1), #ffe3c8 35%, #ffe4f2 70%, var(--bg2));
+      background: radial-gradient(circle at 0% 0%, var(--bg1), #ffe3c8 35%, #ffe4f2 70%, var(--bg2));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -54,6 +54,20 @@
       height: auto;
       display: block;
       object-fit: cover;
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    /* 切換 UWEN1 → UWEN3 用的小動畫 */
+    .photo-fade-out {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    .photo-fade-in {
+      opacity: 1;
+      transform: scale(1);
     }
 
     #intro-photo.fade-out {
@@ -164,7 +178,7 @@
       box-shadow: 0 0 10px rgba(245,158,11,0.85);
     }
 
-    .title { font-size: 28px; margin-bottom: 6px; }
+    .title { font-size: 28px; margin-bottom: 6px; letter-spacing: 0.04em; }
 
     .subtitle {
       font-size: 15px;
@@ -195,6 +209,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
     .front-text {
@@ -214,6 +229,9 @@
       color: #fff;
       font-size: 14px;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       border: none;
       cursor: pointer;
       box-shadow: 0 12px 24px rgba(245, 158, 11, 0.55);
@@ -225,6 +243,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
+      gap: 10px;
     }
 
     .back-title { font-size: 20px; font-weight: 700; }
@@ -243,6 +262,7 @@
       line-height: 1.7;
       white-space: pre-line;
       margin-bottom: 18px;
+      color: var(--text-main);
     }
 
     .list-title {
@@ -252,7 +272,7 @@
       margin-bottom: 4px;
     }
 
-    .wish-list { list-style: none; font-size: 13px; }
+    .wish-list { list-style: none; font-size: 13px; color: var(--text-main); }
 
     .wish-list li { padding: 4px 0; }
 
@@ -262,10 +282,25 @@
       color: var(--text-soft);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+    }
+
+    .heart {
+      font-size: 16px;
+      animation: beat 1.1s infinite;
+      transform-origin: center;
+    }
+
+    @keyframes beat {
+      0%,100% { transform: scale(1); }
+      25% { transform: scale(1.12); }
+      55% { transform: scale(0.96); }
     }
 
     @media (max-width: 480px) {
       .card { height: 480px; }
+      .title { font-size: 24px; }
+      .avatar-wrap { width: 120px; height: 120px; }
       #intro-photo img { max-width: 360px; }
     }
   </style>
@@ -273,14 +308,15 @@
 
 <body>
 
-  <!-- happy-birthday.mp3：跟 HTML 放一起 -->
+  <!-- happy-birthday.mp3 放跟這個 HTML 同一層 -->
   <audio id="bgm" src="happy-birthday.mp3" preload="auto"></audio>
 
-  <!-- 進場照片：UWEN1 -->
-  <div id="intro-photo">
-    <img src="UWEN1.png" alt="UWEN1">
+  <!-- 進場封面：第一次點顯示 UWEN1 → 點一次換 UWEN3 → 再點一次進入卡片 -->
+  <div id="intro-photo" title="點一下看下一張，再點一下進入生日卡片">
+    <img src="UWEN1.png" alt="UWEN1" id="intro-img" />
   </div>
 
+  <!-- 彩帶 -->
   <div class="confetti"></div>
 
   <div class="card-wrapper" id="cardWrapper">
@@ -299,19 +335,21 @@
 
           <div class="avatar-wrap">
             <div class="avatar">
-              <!-- 卡片照片：UWEN2 -->
+              <!-- 卡片上的照片：UWEN2 -->
               <img src="UWEN2.png" alt="UWEN2">
             </div>
           </div>
 
           <p class="front-text">
             幫妳做了一張小小的線上生日卡片，<br>
-            今天就好好當主角，<br>
+            想跟妳說：今天就好好當主角，<br>
             其他的事情先放一邊，專心快樂就好。🎉
           </p>
 
           <div class="open-hint">
-            <button class="open-btn" type="button">打開好友給妳的話 💬</button>
+            <button class="open-btn" type="button">
+              打開好友給妳的話 💬
+            </button>
           </div>
         </section>
 
@@ -325,26 +363,29 @@
           <p class="message">
 阿雯，生日快樂！🥳
 
-謝謝妳願意跟我分享生活，
-有妳可以聊一聊，很多事情都變比較不難熬。
+我們認識這段時間，謝謝妳一直願意跟我分享生活，
+不管是好笑的、崩潰的，還是很日常的那種，
+有妳可以聊一聊，很多事情都變得比較沒那麼難熬。
 
 新的一年，希望妳：
-遇到的辛苦更少，
-遇到的好事更多，
-也希望妳記得，
-妳本身就是很值得被好好對待的人。🧡
+遇到的麻煩事可以少一點，
+遇到的好人好事可以多一點。
+
+也希望妳不要忘記，
+在「很忙、很累、很煩」之外，
+妳本身就是一個很值得被好好對待的人。🧡
           </p>
 
-          <p class="list-title">三個生日願望（好友版）：</p>
+          <p class="list-title">幫妳列三個生日願望（好友版）：</p>
           <ul class="wish-list">
-            <li>🎁 收到的驚喜都剛好是妳喜歡的。</li>
-            <li>🌙 睡眠品質升級，壓力大幅下降。</li>
-            <li>📱 我們之後還可以一直互相更新近況。</li>
+            <li>🎁 希望妳收到的驚喜都剛好是妳喜歡的類型。</li>
+            <li>🌙 希望妳晚上的睡眠品質大幅升級，壓力打折扣。</li>
+            <li>📱 希望以後還可以一直互相更新近況、丟梗圖給對方。</li>
           </ul>
 
           <div class="footer">
-            <span>From：一個珍惜妳的人</span>
-            <span>⭐</span>
+            <span>From：一個很珍惜妳這個朋友的人</span>
+            <span class="heart">⭐</span>
           </div>
         </section>
 
@@ -354,23 +395,49 @@
 
   <script>
     const intro = document.getElementById('intro-photo');
+    const introImg = document.getElementById('intro-img');
     const cardWrapper = document.getElementById('cardWrapper');
     const confetti = document.querySelector('.confetti');
     const card = document.getElementById('card');
     const btn = document.querySelector('.open-btn');
     const bgm = document.getElementById('bgm');
 
+    let introStep = 0; // 0 = UWEN1, 1 = UWEN3, 2 = 進入卡片
+
     intro.addEventListener('click', () => {
-      intro.classList.add('fade-out');
-      cardWrapper.classList.add('show');
-      setTimeout(() => confetti.classList.add('show'), 600);
+      if (introStep === 0) {
+        // UWEN1 -> UWEN3
+        introStep = 1;
+        introImg.classList.add('photo-fade-out');
+        setTimeout(() => {
+          introImg.src = 'UWEN3.png';
+          introImg.classList.remove('photo-fade-out');
+          introImg.classList.add('photo-fade-in');
+          setTimeout(() => {
+            introImg.classList.remove('photo-fade-in');
+          }, 400);
+        }, 300);
+      } else if (introStep === 1) {
+        // 第二次點，進入卡片
+        introStep = 2;
+        intro.classList.add('fade-out');
+        cardWrapper.classList.add('show');
+        setTimeout(() => confetti.classList.add('show'), 600);
+      }
     });
 
     function toggleCard() {
       const isOpen = card.classList.toggle('is-open');
-      if (isOpen) {
-        try { bgm.currentTime = 0; bgm.play(); }
-        catch {}
+
+      // 卡片打開時播放生日快樂歌
+      if (isOpen && bgm) {
+        try {
+          bgm.currentTime = 0;
+          const playPromise = bgm.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {});
+          }
+        } catch (e) {}
       }
     }
 
@@ -384,15 +451,17 @@
       toggleCard();
     });
 
+    // 生成彩帶
     const COUNT = 40;
     for (let i = 0; i < COUNT; i++) {
       const s = document.createElement('span');
       s.style.left = Math.random() * 100 + '%';
       s.style.animationDelay = (Math.random() * 6) + 's';
       s.style.animationDuration = (5 + Math.random() * 4) + 's';
+      s.style.opacity = 0.5 + Math.random() * 0.5;
       confetti.appendChild(s);
     }
   </script>
-
 </body>
 </html>
+
